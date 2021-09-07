@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webdav.fullname" . }}
+  labels:
+    {{- include "webdav.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "webdav.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "webdav.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/bash","-c"]
+          args:
+            - mkdir /usr/local/apache2/{webdav,var};
+              touch /usr/local/apache2/var/DavLock;
+              chown -R www-data:www-data /usr/local/apache2/{webdav,var};
+              su www-data -s /bin/bash -c '
+              for path in /usr/local/apache2/htpasswd.d/*;
+              do
+                  dir=$(basename $path);
+                  if [[ "$dir" != "-" ]]; then mkdir -p /usr/local/apache2/webdav/$dir; fi;
+              done
+              ';
+              httpd-foreground
+          volumeMounts:
+            - name: httpd-conf
+              mountPath: /usr/local/apache2/conf/httpd.conf
+              subPath: httpd.conf
+            - name: htpasswd
+              mountPath: /usr/local/apache2/htpasswd.d
+          {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: /usr/local/apache2/webdav
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+         - name: httpd-conf
+           configMap:
+             name: httpd-conf
+             defaultMode: 0644
+         - name: htpasswd
+           configMap:
+             name: htpasswd
+             defaultMode: 0644
+         {{- if .Values.persistence.enabled }}
+         - name: data
+           persistentVolumeClaim:
+             claimName: {{ .Values.persistence.existingClaim | default (include "webdav.fullname" .) }}
+         {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

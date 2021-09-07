@@ -1,0 +1,9 @@
+apiVersion: v2
+name: webdav
+version: 0.0.1
+description: A Helm chart for Kubernetes
+type: application
+home: https://github.com/danuk/k8s-webdav
+maintainers:
+  - name: danuk
+    email: mail@danuk.ru

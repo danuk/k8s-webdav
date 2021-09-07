@@ -1,0 +1,160 @@
+urls: {}
+#  /:
+#  - user: user1
+#    password: password1
+#  - user: user2
+#    password: password2
+#  /foo:
+#  - user: user3
+#    password: password3
+
+service:
+  type: ClusterIP
+  port: 80
+  annotations: {}
+
+imagePullSecrets: []
+#  - name: regcred
+
+ingress:
+  host: my-domain.com
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1000m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "600"
+    kubernetes.io/ingress.class: nginx
+#    kubernetes.io/tls-acme: "true"
+
+persistence:
+  enabled: false
+  type: pvc
+  # storageClassName: default
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  # annotations: {}
+  finalizers:
+    - kubernetes.io/pvc-protection
+  # existingClaim:
+
+replicaCount: 1
+
+image:
+  repository: httpd
+  tag: "2.4"
+  pullPolicy: IfNotPresent
+
+httpd_conf: |-
+  Listen 80
+
+  LoadModule mpm_event_module modules/mod_mpm_event.so
+  LoadModule alias_module modules/mod_alias.so
+  LoadModule authn_core_module modules/mod_authn_core.so
+  LoadModule authn_file_module modules/mod_authn_file.so
+  LoadModule authz_core_module modules/mod_authz_core.so
+  LoadModule authz_user_module modules/mod_authz_user.so
+  LoadModule dav_module modules/mod_dav.so
+  LoadModule dav_fs_module modules/mod_dav_fs.so
+
+  LoadModule unixd_module modules/mod_unixd.so
+  User www-data
+  Group www-data
+
+  ErrorLog /proc/self/fd/2
+  LogLevel warn
+  Redirect gone /favicon.ico
+  RedirectMatch gone ^/apple-touch-icon
+
+  LoadModule log_config_module modules/mod_log_config.so
+  LogFormat "%h %l %u %t \"%r\" %>s %b" common
+  CustomLog /proc/self/fd/1 common
+
+  LoadModule mime_module modules/mod_mime.so
+  TypesConfig conf/mime.types
+
+  LoadModule autoindex_module modules/mod_autoindex.so
+  Include conf/extra/httpd-autoindex.conf
+
+  ServerRoot "/usr/local/apache2"
+  ServerName {{ .Values.ingress.host }}
+  ServerAdmin webmaster@localhost
+
+  DocumentRoot "/usr/local/apache2/webdav"
+  <Directory "/usr/local/apache2/webdav">
+      Require all denied
+  </Directory>
+
+  <Directory />
+      Options FollowSymLinks
+      AllowOverride none
+  </Directory>
+
+  DavLockDB "/usr/local/apache2/var/DavLock"
+
+  AddDefaultCharset UTF-8
+  IndexOptions Charset=UTF-8 NameWidth=*
+
+  LoadModule auth_basic_module modules/mod_auth_basic.so
+  {{- range $path, $users := .Values.urls }}
+  {{- $url := ( $path | replace "/" "" ) }}
+  <Directory "/usr/local/apache2/webdav/{{ $url }}">
+      Dav On
+      Options Indexes FollowSymLinks
+      AllowOverride None
+      AuthType Basic
+      AuthName "Restricted area"
+      AuthUserFile /usr/local/apache2/htpasswd.d/{{ $url | default "-" }}
+      Require valid-user
+  </Directory>
+  {{- end }}
+
+  # This lets certain DAV methods work behind an SSL reverse proxy.
+  LoadModule headers_module modules/mod_headers.so
+  RequestHeader edit Destination ^https http early
+
+  # These disable redirects on non-GET requests for directories that
+  # don't include the trailing slash (for misbehaving clients).
+  LoadModule setenvif_module modules/mod_setenvif.so
+  BrowserMatch "Microsoft Data Access Internet Publishing Provider" redirect-carefully
+  BrowserMatch "MS FrontPage" redirect-carefully
+  BrowserMatch "^WebDrive" redirect-carefully
+  BrowserMatch "^WebDAVFS/1.[01234]" redirect-carefully
+  BrowserMatch "^gnome-vfs/1.0" redirect-carefully
+  BrowserMatch "^XML Spy" redirect-carefully
+  BrowserMatch "^Dreamweaver-WebDAV-SCM1" redirect-carefully
+  BrowserMatch " Konqueror/4" redirect-carefully
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 33
+
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+    - SYS_ADMIN
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
