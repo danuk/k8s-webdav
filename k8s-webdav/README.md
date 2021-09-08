@@ -45,7 +45,7 @@ and changing it.
 ### Deploy the WebDav server to Kubernetes:
 ```
 helm repo add k8s-webdav https://danuk.github.io/k8s-webdav/
-helm upgrade -i k8s-webdav k8s-webdav/k8s-webdav -f values.yaml
+helm upgrade -i my-webdav k8s-webdav/webdav -f values.yaml
 ```
 
 
