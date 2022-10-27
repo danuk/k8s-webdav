@@ -28,9 +28,9 @@ urls:
     password: password3
 
 ingress:
+  className: "nginx"
   host: my-domain.com
   annotations:
-    kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
 
 persistence:
