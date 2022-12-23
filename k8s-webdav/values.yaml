@@ -26,6 +26,9 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "600"
 #    kubernetes.io/tls-acme: "true"
+  tls:
+    enabled: true
+    secret: webdav-tls-secret
 
 persistence:
   enabled: false

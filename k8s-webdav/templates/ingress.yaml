@@ -19,7 +19,9 @@ spec:
             name: {{ include "webdav.fullname" . }}
             port:
               number: 80
+{{- if .Values.ingress.tls.enabled }}
   tls:
   - hosts:
     - {{ .Values.ingress.host }}
-    secretName: webdav-tls-secret
+    secretName: {{ .Values.ingress.tls.secret }}
+{{- end }}
