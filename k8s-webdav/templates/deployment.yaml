@@ -69,11 +69,18 @@ spec:
           configMap:
             name: htpasswd
             defaultMode: 0644
-        {{- if .Values.persistence.enabled }}
+      {{- if .Values.persistence.enabled }}
         - name: data
+        {{- if eq .Values.persistence.type "pvc" }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "webdav.fullname" .) }}
+        {{- else if eq .Values.persistence.type "hostPath" }}
+          hostPath:
+            path: {{ .Values.persistence.hostPath }}
+        {{- else }}
+          emptyDir: {}
         {{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
