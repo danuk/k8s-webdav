@@ -1,12 +1,19 @@
 urls: {}
-#  /:
-#  - user: user1
-#    password: password1
-#  - user: user2
-#    password: password2
-#  /foo:
-#  - user: user3
-#    password: password3
+  # /:
+  # - user: user1
+  #  password: password1
+  # - user: user2
+  #  password: password2
+  # /foo:
+  # - user: user3
+  #   password: password3
+  # /bar:
+  #   htpasswdSecretRef:
+  #     name: my-existing-htpasswd-secret
+  #     key: file
+
+# existingHtpasswdSecrets:
+#   - name: my-existing-htpasswd-secret
 
 service:
   type: ClusterIP
@@ -108,7 +115,12 @@ httpd_conf: |-
       AllowOverride None
       AuthType Basic
       AuthName "Restricted area"
-      AuthUserFile /usr/local/apache2/htpasswd.d/{{ $url | default "-" }}
+    {{- if kindIs "slice" $users }}
+      AuthUserFile /usr/local/apache2/htpasswd.d/generated/{{ include "returnUrlPathHtpasswdFilename" $path }}
+    {{- else if kindIs "map" $users }}
+      {{- $htpasswdSecretRef := $users.htpasswdSecretRef | required ".Values.urls.[*].htpasswdSecretRef is required if if the url value is defined as map" }}
+      AuthUserFile /usr/local/apache2/htpasswd.d/existing/{{ $htpasswdSecretRef.name }}/{{ $htpasswdSecretRef.key }}
+    {{- end }}
       Require valid-user
   </Directory>
   {{- end }}

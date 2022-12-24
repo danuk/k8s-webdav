@@ -51,3 +51,10 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Logic to make httpasswd filename generated based on URL's paths
+*/}}
+{{- define "returnUrlPathHtpasswdFilename" -}}
+{{- printf "%s" . | replace "/" "" | default "-" -}}
+{{- end }}

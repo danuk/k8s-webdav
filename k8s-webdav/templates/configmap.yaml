@@ -12,10 +12,14 @@ kind: ConfigMap
 metadata:
   name: htpasswd
 data:
-  {{- range $path, $users := .Values.urls }}
-  {{ $path | replace "/" "" | default "-" }}: |-
-      {{ range $user := $users }}
-      {{- htpasswd $user.user $user.password }}
-      {{ end }}
+{{- range $path, $users := .Values.urls }}
+  {{- if kindIs "slice" $users }}
+  {{ include "returnUrlPathHtpasswdFilename" $path }}: |-
+    {{ range $user := $users }}
+      {{- $username := $user.user | required ".Values.urls[*].user is required if if the URL value is defined as list" }}
+      {{- $password := $user.password | required ".Values.urls[*].password is required if if the URL value is defined as list" }}
+      {{- htpasswd $username $password }}
+    {{- end }}
   {{- end }}
+{{- end }}
 

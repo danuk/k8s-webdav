@@ -16,7 +16,7 @@ This chart only works with helm3, because of `htpasswd` function has been availa
 To deploy to Kubernetes follow these steps:
 
 ### Create `values.yaml` file like this:
-```
+```YAML
 urls:
   /:
   - user: user1
@@ -42,10 +42,54 @@ You can also change the Apache configuration, if necessary, by downloading the d
 [values.yaml](https://raw.githubusercontent.com/danuk/k8s-webdav/master/k8s-webdav/values.yaml)
 and changing it.
 
+### Use existing k8s secret for authentication:
+
+Existing htpasswd secret stored within the same namespace can be used.
+
+Example:
+```YAML
+urls:
+  /:
+    htpasswdSecretRef:
+      name: htpasswd
+      key: root
+
+existingHtpasswdSecrets:
+  - name: htpasswd
+```
+
+The htpasswd secret shall be created in advance. The `htpasswd` tool can be used to generate the secret.
+
+First generate the htpasswd content for the user(s):
+
+```shell
+$ htpasswd -n -b user password
+user:$apr1$DRUWLwA4$bG9RXXF1XAAF1dCIIoX/H1
+```
+
+Create a secret from it and apply on the cluster before installing the helm release.
+
+#### `htpasswd-secret.yaml`:
+```YAML
+apiVersion: v1
+kind: Secret
+metadata:
+  name: htpasswd
+type: Opaque
+stringData:
+  root: |
+    user:$apr1$DRUWLwA4$bG9RXXF1XAAF1dCIIoX/H1
+```
+
+Add multiple lines to the secret data value to add more user authentications and add more secret data keys to create multiple user authentication sets to refer.
+
+Apply it:
+```shell
+kubectl apply -f htpasswd-secret.yaml
+```
+
 ### Deploy the WebDav server to Kubernetes:
 ```
 helm repo add k8s-webdav https://danuk.github.io/k8s-webdav/
 helm upgrade -i my-webdav k8s-webdav/webdav -f values.yaml
 ```
-
-
