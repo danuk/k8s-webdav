@@ -36,20 +36,17 @@ spec:
             - mkdir /usr/local/apache2/{webdav,var};
               touch /usr/local/apache2/var/DavLock;
               chown -R www-data:www-data /usr/local/apache2/{webdav,var};
-              su www-data -s /bin/bash -c '
-              for path in /usr/local/apache2/htpasswd.d/*;
-              do
-                  dir=$(basename $path);
-                  if [[ "$dir" != "-" ]]; then mkdir -p /usr/local/apache2/webdav/$dir; fi;
-              done
-              ';
               httpd-foreground
           volumeMounts:
             - name: httpd-conf
               mountPath: /usr/local/apache2/conf/httpd.conf
               subPath: httpd.conf
             - name: htpasswd
-              mountPath: /usr/local/apache2/htpasswd.d
+              mountPath: /usr/local/apache2/htpasswd.d/generated
+          {{- range $existingHtpasswdSecret := .Values.existingHtpasswdSecrets }}
+            - name: existing-htpasswd-{{ $existingHtpasswdSecret.name }}
+              mountPath: /usr/local/apache2/htpasswd.d/existing/{{ $existingHtpasswdSecret.name }}
+          {{- end }}
           {{- if .Values.persistence.enabled }}
             - name: data
               mountPath: /usr/local/apache2/webdav
@@ -69,6 +66,12 @@ spec:
           configMap:
             name: htpasswd
             defaultMode: 0644
+      {{- range $existingHtpasswdSecret := .Values.existingHtpasswdSecrets }}
+        - name: existing-htpasswd-{{ $existingHtpasswdSecret.name }}
+          secret:
+            secretName: {{ $existingHtpasswdSecret.name }}
+            defaultMode: 0644
+      {{- end }}
       {{- if .Values.persistence.enabled }}
         - name: data
         {{- if eq .Values.persistence.type "pvc" }}
