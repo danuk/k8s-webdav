@@ -88,6 +88,19 @@ Apply it:
 kubectl apply -f htpasswd-secret.yaml
 ```
 
+### Use HostPath persistency
+
+HostPath can be configured for the persistency type, which mounts a directory from the host.
+
+```YAML
+persistence:
+  enabled: true
+  type: hostPath
+  hostPath: /path/on/host
+```
+
+In this case, it is the user's responsibility to grant permission to the UID:33 GID:33 (www-data) user to manage this directory.
+
 ### Deploy the WebDav server to Kubernetes:
 ```
 helm repo add k8s-webdav https://danuk.github.io/k8s-webdav/

@@ -35,7 +35,10 @@ spec:
           args:
             - mkdir /usr/local/apache2/{webdav,var};
               touch /usr/local/apache2/var/DavLock;
-              chown -R www-data:www-data /usr/local/apache2/{webdav,var};
+            {{- if ne .Values.persistence.type "hostPath" }}
+              chown -R www-data:www-data /usr/local/apache2/webdav;
+            {{- end }}
+              chown -R www-data:www-data /usr/local/apache2/var;
               httpd-foreground
           volumeMounts:
             - name: httpd-conf
