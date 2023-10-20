@@ -53,6 +53,9 @@ spec:
           {{- if .Values.persistence.enabled }}
             - name: data
               mountPath: /usr/local/apache2/webdav
+              {{- with .Values.persistence.subPath }}
+              subPath: {{ . }}
+              {{- end }}
           {{- end }}
           ports:
             - name: http
