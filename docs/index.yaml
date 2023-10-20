@@ -2,7 +2,20 @@ apiVersion: v1
 entries:
   webdav:
   - apiVersion: v2
-    created: "2023-01-22T19:41:22.506012+03:00"
+    created: "2023-10-20T12:12:54.71955+03:00"
+    description: A Helm chart for Kubernetes
+    digest: 4a07e5060225e33d2d720946cb8b2b9289cdc902c522ed9d4ab34e4699eb14ec
+    home: https://github.com/danuk/k8s-webdav
+    maintainers:
+    - email: mail@danuk.ru
+      name: danuk
+    name: webdav
+    type: application
+    urls:
+    - https://danuk.github.io/k8s-webdav/webdav-0.0.7.tgz
+    version: 0.0.7
+  - apiVersion: v2
+    created: "2023-10-20T12:12:54.719083+03:00"
     description: A Helm chart for Kubernetes
     digest: 2371fb54f28843e4584b2868829785458a2be06fc7426d4c9459c06b87f9e782
     home: https://github.com/danuk/k8s-webdav
@@ -15,7 +28,7 @@ entries:
     - https://danuk.github.io/k8s-webdav/webdav-0.0.6.tgz
     version: 0.0.6
   - apiVersion: v2
-    created: "2023-01-22T19:41:22.505496+03:00"
+    created: "2023-10-20T12:12:54.718422+03:00"
     description: A Helm chart for Kubernetes
     digest: fc03329670d25cb7d159d0c81900464308afc63c7655585925bf3deb89d34ef7
     home: https://github.com/danuk/k8s-webdav
@@ -28,7 +41,7 @@ entries:
     - https://danuk.github.io/k8s-webdav/webdav-0.0.5.tgz
     version: 0.0.5
   - apiVersion: v2
-    created: "2023-01-22T19:41:22.504842+03:00"
+    created: "2023-10-20T12:12:54.71779+03:00"
     description: A Helm chart for Kubernetes
     digest: 0196b9cd7fb2835fdc0cbbf7755b9a61dd2a4f5c85721928c4c9f9608a4f961a
     home: https://github.com/danuk/k8s-webdav
@@ -41,7 +54,7 @@ entries:
     - https://danuk.github.io/k8s-webdav/webdav-0.0.4.tgz
     version: 0.0.4
   - apiVersion: v2
-    created: "2023-01-22T19:41:22.504214+03:00"
+    created: "2023-10-20T12:12:54.717157+03:00"
     description: A Helm chart for Kubernetes
     digest: ea47c7009fd82d6409557eadc61a425f3577350e89f42265002400cf5815af6c
     home: https://github.com/danuk/k8s-webdav
@@ -54,7 +67,7 @@ entries:
     - https://danuk.github.io/k8s-webdav/webdav-0.0.3.tgz
     version: 0.0.3
   - apiVersion: v2
-    created: "2023-01-22T19:41:22.503725+03:00"
+    created: "2023-10-20T12:12:54.716656+03:00"
     description: A Helm chart for Kubernetes
     digest: 0856c10f15ee0685374ed4fec05b0b3668fece81493281f20933635c1dff3659
     home: https://github.com/danuk/k8s-webdav
@@ -67,7 +80,7 @@ entries:
     - https://danuk.github.io/k8s-webdav/webdav-0.0.2.tgz
     version: 0.0.2
   - apiVersion: v2
-    created: "2023-01-22T19:41:22.50322+03:00"
+    created: "2023-10-20T12:12:54.716127+03:00"
     description: A Helm chart for Kubernetes
     digest: a8235c86a8beb093d6b81ce911f522bad0635ebc9c2d438d3ac3f7f9388d7259
     home: https://github.com/danuk/k8s-webdav
@@ -79,4 +92,4 @@ entries:
     urls:
     - https://danuk.github.io/k8s-webdav/webdav-0.0.1.tgz
     version: 0.0.1
-generated: "2023-01-22T19:41:22.502236+03:00"
+generated: "2023-10-20T12:12:54.715399+03:00"
